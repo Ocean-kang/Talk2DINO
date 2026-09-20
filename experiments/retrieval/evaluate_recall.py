@@ -59,7 +59,7 @@ data_clip=torch.load(
 data_clip["image_features"] = data_clip["image_features"].float()
 data_clip["text_features"] = data_clip["text_features"].float()
 
-data = data_clip
+data = data_talk2dino
 sim=data["image_features"] @ data["text_features"].T
 
 

@@ -94,7 +94,8 @@ with torch.no_grad():
 
         images=batch["image"].to(device)
 
-        img=dino(images)
+        img=dino.forward_features(images)
+        img=img["x_norm_clstoken"]
 
         img=torch.nn.functional.normalize(
             img,
