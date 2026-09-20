@@ -38,6 +38,7 @@ class DINOTextSegInference(EncoderDecoder):
         else:
             self.num_classes = len(text_embedding)
 
+        self.out_channels = self.num_classes
         self.align_corners = False
         logger = get_logger()
         logger.info(
