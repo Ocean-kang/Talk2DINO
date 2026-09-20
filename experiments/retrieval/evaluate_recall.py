@@ -1,318 +1,96 @@
+
 import torch
-import json
-import argparse
+
+
+def recall_i2t(sim, image_ids, caption_to_image, k):
+
+    top=torch.topk(
+        sim,
+        k=k,
+        dim=1
+    ).indices
+
+    hit=0
+
+    for i,row in enumerate(top):
+
+        retrieved=[
+            caption_to_image[j]
+            for j in row
+        ]
+
+        if image_ids[i] in retrieved:
+            hit+=1
+
+    return hit/len(image_ids)
 
 
 
-def compute_i2t(
-        image_features,
-        text_features,
-        image_ids,
-        caption_to_image
-):
+def recall_t2i(sim, caption_to_image, image_ids, k):
 
+    top=torch.topk(
+        sim,
+        k=k,
+        dim=1
+    ).indices
 
-    print("Computing Image-to-Text...")
+    hit=0
 
+    for i,row in enumerate(top):
 
-    similarity = (
-        image_features
-        @
-        text_features.T
-    )
+        retrieved=[
+            image_ids[j]
+            for j in row
+        ]
 
+        if caption_to_image[i] in retrieved:
+            hit+=1
 
-    recalls={}
-
-
-    for k in [1,5,10]:
-
-        hit=0
-
-
-        topk=torch.topk(
-            similarity,
-            k=k,
-            dim=1
-        ).indices
+    return hit/len(caption_to_image)
 
 
 
-        for i in range(
-            len(image_ids)
-        ):
+data_talk2dino=torch.load(
+"./outputs/retrieval/outputs_talk2dino_retrieval.pt"
+)
+data_clip=torch.load(
+"./outputs/retrieval/outputs_clip_retrieval.pt"
+)
+data_clip["image_features"] = data_clip["image_features"].float()
+data_clip["text_features"] = data_clip["text_features"].float()
 
-            gt=image_ids[i]
-
-
-            retrieved=topk[i]
-
-
-            flag=False
-
-
-            for idx in retrieved:
+data = data_clip
+sim=data["image_features"] @ data["text_features"].T
 
 
-                if caption_to_image[
-                    idx.item()
-                ]==gt:
-
-                    flag=True
-                    break
-
-
-            if flag:
-                hit+=1
-
-
-
-        recalls[k]=hit/len(image_ids)
-
-
-
-    return recalls
-
-
-
-
-
-def compute_t2i(
-
-        image_features,
-        text_features,
-        image_ids,
-        caption_to_image
-
-):
-
+for k in [1,5,10]:
 
     print(
-        "Computing Text-to-Image..."
-    )
-
-
-    similarity=(
-
-        text_features
-
-        @
-
-        image_features.T
-
-    )
-
-
-
-    recalls={}
-
-
-    id_to_index={}
-
-    for i,x in enumerate(image_ids):
-
-        id_to_index[x]=i
-
-
-
-    gt=[]
-
-    for x in caption_to_image:
-
-        gt.append(
-            id_to_index[x]
+        "Image-to-Text R@{}: {:.4f}".format(
+            k,
+            recall_i2t(
+                sim,
+                data["image_ids"],
+                data["caption_to_image"],
+                k
+            )
         )
-
-
-
-    gt=torch.tensor(gt)
-
-
-
-    for k in [1,5,10]:
-
-
-        hit=0
-
-
-        topk=torch.topk(
-
-            similarity,
-
-            k=k,
-
-            dim=1
-
-        ).indices
-
-
-
-        for i in range(
-            len(gt)
-        ):
-
-
-            if gt[i] in topk[i]:
-
-                hit+=1
-
-
-
-        recalls[k]=hit/len(gt)
-
-
-
-    return recalls
-
-
-
-
-
-parser=argparse.ArgumentParser()
-
-parser.add_argument(
-    "--method",
-    default="clip",
-    choices=[
-        "clip",
-        "talk2dino"
-    ]
-)
-
-
-args=parser.parse_args()
-
-
-
-# =======================
-# Load CLIP text feature
-# =======================
-
-
-clip=torch.load(
-
-"outputs/retrieval/outputs_clip_retrieval.pt",
-
-map_location="cpu"
-
-)
-
-
-clip["image_features"]=(
-    clip["image_features"]
-    .float()
-)
-
-
-clip["text_features"]=(
-    clip["text_features"]
-    .float()
-)
-
-
-
-if args.method=="clip":
-
-
-    image_features=clip["image_features"]
-
-
-
-else:
-
-
-    talk=torch.load(
-
-    "outputs/retrieval/outputs_talk2dino_retrieval.pt",
-
-    map_location="cpu"
-
     )
 
 
-    talk["image_features"]=(
-        talk["image_features"]
-        .float()
-    )
+sim2=sim.T
 
 
-    image_features=talk["image_features"]
-
-
-
-text_features=clip["text_features"]
-
-
-image_ids=clip["image_ids"]
-
-
-caption_to_image=clip["caption_to_image"]
-
-
-
-print(
-"image:",
-image_features.shape
-)
-
-
-print(
-"text:",
-text_features.shape
-)
-
-
-
-i2t=compute_i2t(
-
-    image_features,
-
-    text_features,
-
-    image_ids,
-
-    caption_to_image
-
-)
-
-
-
-t2i=compute_t2i(
-
-    image_features,
-
-    text_features,
-
-    image_ids,
-
-    caption_to_image
-
-)
-
-
-
-print("\n====================")
-
-print(args.method)
-
-
-print("\nImage-to-Text")
-
-for k,v in i2t.items():
+for k in [1,5,10]:
 
     print(
-        f"R@{k}: {v*100:.3f}"
+        "Text-to-Image R@{}: {:.4f}".format(
+            k,
+            recall_t2i(
+                sim2,
+                data["caption_to_image"],
+                data["image_ids"],
+                k
+            )
+        )
     )
-
-
-
-print("\nText-to-Image")
-
-for k,v in t2i.items():
-
-    print(
-        f"R@{k}: {v*100:.3f}"
-    )
-
-
-print("====================")

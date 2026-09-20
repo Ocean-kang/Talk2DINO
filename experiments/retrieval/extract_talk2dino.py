@@ -1,58 +1,38 @@
+
 import sys
-
-sys.path.append(
-    "/home/master/code/oymk/Talking2dino/Talk2DINO"
-)
-
+sys.path.append("/home/master/code/oymk/Talking2dino/Talk2DINO")
 
 import torch
+import clip
+from tqdm import tqdm
+from torch.utils.data import DataLoader
 import torchvision.transforms as T
 
-from torch.utils.data import DataLoader
-from tqdm import tqdm
-
-
-from coco_dataset import COCORetrievalDataset, retrieval_collate_fn
-
-
 from src.model import ProjectionLayer
-
+from coco_dataset import COCORetrievalDataset, retrieval_collate_fn
 
 
 device="cuda"
 
 
-
-# ============================
-# DINOv2
-# ============================
-
-print("Loading DINOv2")
-
-
 dino=torch.hub.load(
     "facebookresearch/dinov2",
     "dinov2_vitb14"
-)
+).to(device)
 
-
-dino.cuda()
 dino.eval()
 
 
+clip_model, _ = clip.load(
+    "ViT-B/16",
+    device=device
+)
 
-# ============================
-# CLIP text projector
-# ============================
-
-print("Loading ProjectionLayer")
+clip_model.eval()
 
 
-projector=ProjectionLayer(
-    dino_embed_dim=768,
-    clip_embed_dim=512,
-    hidden_layer=1
-
+projector=ProjectionLayer.from_config(
+    "configs/vitb_mlp_infonce.yaml"
 )
 
 
@@ -61,136 +41,111 @@ ckpt=torch.load(
     map_location="cpu"
 )
 
-
-print(
-    "checkpoint:",
-    ckpt.keys()
-)
-
+if "state_dict" in ckpt:
+    ckpt=ckpt["state_dict"]
+elif "model" in ckpt:
+    ckpt=ckpt["model"]
 
 projector.load_state_dict(
     ckpt,
-    strict=True
+    strict=False
 )
 
-
-projector.cuda()
+projector.to(device)
 projector.eval()
 
 
-
-# ============================
-# Image transform
-# ============================
-
-
-transform=T.Compose(
-[
+transform=T.Compose([
     T.Resize(224),
     T.CenterCrop(224),
-
     T.ToTensor(),
-
     T.Normalize(
         (0.485,0.456,0.406),
         (0.229,0.224,0.225)
     )
-]
-)
-
+])
 
 
 dataset=COCORetrievalDataset(
-
     "data/coco2014/val2014",
-
     "data/coco2014/annotations/captions_val2014.json",
-
     transform
-
 )
 
 
-
-loader = DataLoader(
+loader=DataLoader(
     dataset,
-    batch_size=64,
+    batch_size=32,
     shuffle=False,
     num_workers=8,
     collate_fn=retrieval_collate_fn
 )
 
 
-
-features=[]
-
+image_features=[]
+text_features=[]
 image_ids=[]
-
+caption_to_image=[]
 
 
 with torch.no_grad():
 
     for batch in tqdm(loader):
 
+        images=batch["image"].to(device)
 
-        images=batch["image"].cuda()
+        img=dino(images)
 
-
-
-        # DINO feature
-
-        feat=dino(images)
-
-
-        feat=feat.float()
-
-
-        feat/=feat.norm(
-            dim=-1,
-            keepdim=True
+        img=torch.nn.functional.normalize(
+            img,
+            dim=-1
         )
 
-
-
-        features.append(
-            feat.cpu()
+        image_features.append(
+            img.cpu()
         )
-
 
         image_ids.extend(
             batch["image_id"]
         )
 
 
+        texts=[]
+        ids=[]
 
-features=torch.cat(
-    features
-)
+        for i,caps in enumerate(batch["captions"]):
+            texts.extend(caps)
+            ids.extend(
+                [batch["image_id"][i]]*len(caps)
+            )
 
 
+        token=clip.tokenize(texts).to(device)
 
-print(
-"image feature:",
-features.shape
-)
+        txt=clip_model.encode_text(token)
+        txt=projector.project_clip_txt(txt)
+        txt=torch.nn.functional.normalize(
+            txt,
+            dim=-1
+        )
+
+
+        text_features.append(
+            txt.cpu()
+        )
+
+        caption_to_image.extend(ids)
 
 
 
 torch.save(
-
 {
-
-"image_features":
-features,
-
-"image_ids":
-image_ids
-
+"image_features":torch.cat(image_features),
+"text_features":torch.cat(text_features),
+"image_ids":image_ids,
+"caption_to_image":caption_to_image
 },
-
-"outputs/retrieval/outputs_talk2dino_retrieval.pt"
-
+"outputs_talk2dino_retrieval.pt"
 )
-
 
 print("saved")
