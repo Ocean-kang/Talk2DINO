@@ -53,11 +53,14 @@ def recall_t2i(sim, caption_to_image, image_ids, k):
 data_talk2dino=torch.load(
 "./outputs/retrieval/outputs_talk2dino_retrieval.pt"
 )
-data_clip=torch.load(
-"./outputs/retrieval/outputs_clip_retrieval.pt"
-)
-data_clip["image_features"] = data_clip["image_features"].float()
-data_clip["text_features"] = data_clip["text_features"].float()
+# data_talk2dino_cls=torch.load(
+# "./outputs/retrieval/outputs_talk2dino_cls_retrieval.pt"
+# )
+# data_clip=torch.load(
+# "./outputs/retrieval/outputs_clip_retrieval.pt"
+# )
+# data_clip["image_features"] = data_clip["image_features"].float()
+# data_clip["text_features"] = data_clip["text_features"].float()
 
 data = data_talk2dino
 sim=data["image_features"] @ data["text_features"].T
