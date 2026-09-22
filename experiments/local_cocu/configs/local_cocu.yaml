@@ -1,0 +1,19 @@
+
+DATA:
+  coco_root: data/coco2014
+  image_dir: train2014
+  caption_file: data/coco2014/annotations/captions_train2014.json
+
+MODEL:
+  dino: dinov2_vitb14
+  clip: ViT-B/16
+  projector: weights/vitb_mlp_infonce.pth
+
+PATH:
+  gallery: outputs/coco_gallery/coco2014_gallery.json
+
+OUTPUT:
+  root: outputs/local_cocu
+
+RETRIEVAL:
+  topk: 50
