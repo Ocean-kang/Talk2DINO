@@ -8,11 +8,9 @@ CUDA_ID=1
 cd "$ROOT_DIR"
 
 WEIGHTS=(
-    "weights/bootstrap_teacher/a0/vitb_mlp_infonce_teacher_bootstrap_a0.pth"
-    "weights/bootstrap_teacher/a0p1/vitb_mlp_infonce_teacher_bootstrap_a0p1.pth"
-    "weights/bootstrap_teacher/a0p5/vitb_mlp_infonce_teacher_bootstrap_a0p3.pth"
+    "weights/bootstrap_teacher/a0p3/vitb_mlp_infonce_teacher_bootstrap_a0p3.pth"
     "weights/bootstrap_teacher/a0p5/vitb_mlp_infonce_teacher_bootstrap_a0p5.pth"
-    "weights/bootstrap_teacher/a0p5/vitb_mlp_infonce_teacher_bootstrap_a0p7.pth"
+    "weights/bootstrap_teacher/a0p7/vitb_mlp_infonce_teacher_bootstrap_a0p7.pth"
     "weights/bootstrap_teacher/a1/vitb_mlp_infonce_teacher_bootstrap_a1.pth"
 )
 
