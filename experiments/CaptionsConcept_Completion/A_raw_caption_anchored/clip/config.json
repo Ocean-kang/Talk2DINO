@@ -1,0 +1,6 @@
+{
+  "source": "clip",
+  "manifest": "experiments/CaptionsConcept_Completion/A_raw_caption_anchored/clip/concepts_manifest.json",
+  "output": "outputs/CaptionsConcept_Completion/A/train_clip.pth",
+  "weight_suffix": "ccA_clip"
+}

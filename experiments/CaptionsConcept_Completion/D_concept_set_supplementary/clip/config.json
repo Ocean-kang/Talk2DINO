@@ -1,0 +1,8 @@
+{
+  "source": "clip",
+  "manifest": "experiments/CaptionsConcept_Completion/D_concept_set_supplementary/clip/concepts_manifest.json",
+  "output": "outputs/CaptionsConcept_Completion/D/train_clip.pth",
+  "weight_suffix": "ccD_clip",
+  "min_visual_ratio": 0.85,
+  "max_concepts": 3
+}

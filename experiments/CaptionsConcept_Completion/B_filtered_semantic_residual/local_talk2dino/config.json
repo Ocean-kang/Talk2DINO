@@ -1,0 +1,11 @@
+{
+  "source": "local_talk2dino",
+  "manifest": "experiments/CaptionsConcept_Completion/B_filtered_semantic_residual/local_talk2dino/concepts_manifest.json",
+  "output": "outputs/CaptionsConcept_Completion/B/train_local_talk2dino.pth",
+  "weight_suffix": "ccB_local_talk2dino",
+  "min_visual_ratio": 0.85,
+  "semantic_floor": 0.18,
+  "consistency_margin": 0.2,
+  "redundancy_ceiling": 0.9,
+  "max_concepts": 3
+}

@@ -1,0 +1,8 @@
+{
+  "source": "local_talk2dino",
+  "manifest": "experiments/CaptionsConcept_Completion/D_concept_set_supplementary/local_talk2dino/concepts_manifest.json",
+  "output": "outputs/CaptionsConcept_Completion/D/train_local_talk2dino.pth",
+  "weight_suffix": "ccD_local_talk2dino",
+  "min_visual_ratio": 0.85,
+  "max_concepts": 3
+}

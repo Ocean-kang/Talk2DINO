@@ -1,0 +1,11 @@
+{
+  "source": "clip",
+  "manifest": "experiments/CaptionsConcept_Completion/B_filtered_semantic_residual/clip/concepts_manifest.json",
+  "output": "outputs/CaptionsConcept_Completion/B/train_clip.pth",
+  "weight_suffix": "ccB_clip",
+  "min_visual_ratio": 0.85,
+  "semantic_floor": 0.18,
+  "consistency_margin": 0.2,
+  "redundancy_ceiling": 0.9,
+  "max_concepts": 3
+}
