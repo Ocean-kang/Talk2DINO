@@ -1,0 +1,1 @@
+faiss-cpu  # schemes B, E and F (select a version compatible with your numpy stack)
