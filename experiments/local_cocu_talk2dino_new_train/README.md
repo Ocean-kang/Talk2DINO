@@ -34,7 +34,7 @@ Talk2DINO/
 
 默认源 JSON 位置由 `--scheme A..H` 自动解析；H 使用 `H_iterative_bootstrap/round_1/concepts_by_image.json`（可用 `--round 2` 替换，构建数据和训练输出也按 `round_2` 独立隔离）。也可以通过 `--concepts /absolute/path/to/concepts_by_image.json` 覆盖。支持 `matched_concepts_detailed.json`（相同的 image-id 字典结构）。
 
-**运行前验证**：所有数据相对路径均以仓库根目录为起点。默认检查提取结果至少覆盖训练 PTH 的全部 image_id；没有 concept 的已有图允许退回原始 5 条。若你的 concept 文件本来只来自 5k 子集，请同步指定对应子集 base PTH，或明确使用 `--missing-policy subset`（仅对交集训练，不能直接与全量 baseline 公平对照）。`--missing-policy keep_raw` 可以为缺失 ID 保留五条原始 caption。
+**端口与训练进度条**：子进程使用 `MASTER_PORT=0`，由操作系统/TCPStore 选择临时端口，避免固定的 `29501` 冲突。训练阶段按字节块实时转发 stdout/stderr，保留 tqdm 的回车刷新行为；完整输出仍写入 `train.log`。\n\n**运行前验证**：所有数据相对路径均以仓库根目录为起点。默认检查提取结果至少覆盖训练 PTH 的全部 image_id；没有 concept 的已有图允许退回原始 5 条。若你的 concept 文件本来只来自 5k 子集，请同步指定对应子集 base PTH，或明确使用 `--missing-policy subset`（仅对交集训练，不能直接与全量 baseline 公平对照）。`--missing-policy keep_raw` 可以为缺失 ID 保留五条原始 caption。
 
 ## 环境
 

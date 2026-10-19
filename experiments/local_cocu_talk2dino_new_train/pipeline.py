@@ -30,18 +30,34 @@ BENCHMARKS = {
 }
 
 
-def run(cmd: list[str], gpu: str, log: Path | None = None) -> None:
+def make_env(gpu: str) -> dict[str, str]:
+    # WORLD_SIZE=1: delegate ephemeral port allocation to OS/TCPStore.
     env = os.environ.copy()
     env["CUDA_VISIBLE_DEVICES"] = str(gpu)
     env.setdefault("PYTHONHASHSEED", "123")
-    env.update({"MASTER_ADDR": "127.0.0.1", "MASTER_PORT": "29501", "RANK": "0",
-                "WORLD_SIZE": "1", "LOCAL_RANK": "0", "LOCAL_WORLD_SIZE": "1"})
+    env["PYTHONUNBUFFERED"] = "1"
+    env.update({
+        "MASTER_ADDR": "127.0.0.1",
+        "MASTER_PORT": "0",
+        "RANK": "0",
+        "WORLD_SIZE": "1",
+        "LOCAL_RANK": "0",
+        "LOCAL_WORLD_SIZE": "1",
+    })
+    return env
+
+
+def run(cmd: list[str], gpu: str, log: Path | None = None,
+        live_progress: bool = False) -> None:
+    env = make_env(gpu)
     args = [str(x) for x in cmd]
     print("[CMD]", " ".join(args), flush=True)
     if log is None:
         subprocess.run(args, cwd=ROOT, env=env, check=True)
-    else:
-        log.parent.mkdir(parents=True, exist_ok=True)
+        return
+
+    log.parent.mkdir(parents=True, exist_ok=True)
+    if not live_progress:
         with log.open("w", encoding="utf-8") as output:
             proc = subprocess.Popen(args, cwd=ROOT, env=env, stdout=subprocess.PIPE,
                                     stderr=subprocess.STDOUT, text=True, bufsize=1)
@@ -50,9 +66,36 @@ def run(cmd: list[str], gpu: str, log: Path | None = None) -> None:
                 output.write(line)
                 print(line, end="", flush=True)
             code = proc.wait()
-            if code:
-                raise subprocess.CalledProcessError(code, args)
+        if code:
+            raise subprocess.CalledProcessError(code, args)
+        return
 
+    # tqdm redraws with carriage returns, so stream chunks instead of lines.
+    # This keeps the progress bar live and stores the same output in train.log.
+    with log.open("wb") as output:
+        proc = subprocess.Popen(args, cwd=ROOT, env=env, stdout=subprocess.PIPE,
+                                stderr=subprocess.STDOUT, bufsize=0)
+        assert proc.stdout is not None
+        try:
+            fd = proc.stdout.fileno()
+            while True:
+                chunk = os.read(fd, 8192)
+                if not chunk:
+                    break
+                output.write(chunk)
+                output.flush()
+                binary_stdout = getattr(sys.stdout, "buffer", None)
+                if binary_stdout is not None:
+                    binary_stdout.write(chunk)
+                    binary_stdout.flush()
+                else:
+                    sys.stdout.write(chunk.decode("utf-8", errors="replace"))
+                    sys.stdout.flush()
+        finally:
+            proc.stdout.close()
+        code = proc.wait()
+        if code:
+            raise subprocess.CalledProcessError(code, args)
 
 def relative(path: str) -> Path:
     p = Path(path).expanduser()
@@ -150,7 +193,8 @@ def train(args: argparse.Namespace, work: Path, weight: Path, link: Path, proj: 
     run([sys.executable, "train.py", "--model_config", args.config,
          "--train_dataset", work / "train_augmented.pth", "--val_dataset", relative(args.val),
          "--feature_name", "disentangled_self_attn", "--text_features", "ann_feats",
-         "--name_pedix", proj[len("vitb_mlp_infonce_"):]], args.gpu, work / "train.log")
+         "--name_pedix", proj[len("vitb_mlp_infonce_"):]], args.gpu, work / "train.log",
+        live_progress=True)
     check(link)  # original train.py writes the checkpoint in weights/
     shutil.move(str(link), str(weight))
     link_checkpoint(weight, link)
@@ -191,7 +235,7 @@ def evaluate(args: argparse.Namespace, work: Path, weight: Path, link: Path, pro
             run([sys.executable, "src/open_vocabulary_segmentation/main.py",
                  "--eval", "--eval_cfg", f"{CFG}/{e}", "--eval_base_cfg", f"{CFG}/{b}",
                  "--output", dest, "--opts", f"model.proj_name={proj}"],
-                args.gpu, dest / "run.log")
+                args.gpu, dest / "run.log", live_progress=True)
             # main.py appends each task into segmentation_results/<proj>.json
             produced = ROOT / "segmentation_results" / f"{proj}.json"
             check(produced)
