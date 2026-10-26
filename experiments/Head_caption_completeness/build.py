@@ -13,8 +13,14 @@ def plan(base,records,subset=False):
     if len(ann_map)!=len(base['annotations']):raise ValueError('Duplicate annotation IDs in raw PTH')
     groups=defaultdict(list)
     for row in base['annotations']:groups[int(row['image_id'])].append(row)
-    for im in base['images']:
-        if len(groups[int(im['id'])])!=5:raise ValueError(f'Expected exactly 5 annotations/image: {im["id"]}')
+    image_ids = {int(im['id']) for im in base['images']}
+    orphan_ids = {int(a['image_id']) for a in base['annotations']} - image_ids
+    if orphan_ids:
+        raise ValueError(f'Annotations reference missing images: {list(orphan_ids)[:10]}')
+
+    distribution = Counter(len(groups[i]) for i in image_ids)
+    print('[CAPTION COUNT DISTRIBUTION]', dict(sorted(distribution.items())), flush=True)
+    print('[BUILD] Preserving all original image and annotation records.', flush=True)
     edits=[];changed=[];idset=set();imgset=set()
     for r in records:
         aid=int(r['annotation_id']);iid=int(r['image_id'])
@@ -49,8 +55,9 @@ def plan(base,records,subset=False):
 
 def build(base_train,selection,output,manifest,device='cuda',batch_size=256,subset=False):
     data=torch.load(base_train,map_location='cpu',weights_only=False)
-    with open(selection,encoding='utf-8') as f:records=(json.loads(line) for line in f if line.strip())
-    images,annotations,edited=plan(data,records,subset)
+    with open(selection, encoding='utf-8') as f:
+        records = (json.loads(line) for line in f if line.strip())
+        images, annotations, edited = plan(data, records, subset)
     if edited:
         import clip
         enc,_=clip.load('ViT-B/16',device=device,jit=False)

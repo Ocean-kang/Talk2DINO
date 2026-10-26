@@ -103,7 +103,7 @@ def link_checkpoint(weight,link):
 def run_build(a,work):
     if a.variant=='E0':
         print('[E0] uses original unmodified train.pth',flush=True);return
-    require(a.base_train);require(a.selection/a.variant+'.jsonl')
+    require(a.base_train);require(a.selection / f"{a.variant}.jsonl")
     target=OUT/'training'/a.variant/'train.pth'
     manifest=OUT/'training'/a.variant/'manifest.json'
     # Dataset is seed-invariant: two jobs may build concurrently; guarded by flock.
