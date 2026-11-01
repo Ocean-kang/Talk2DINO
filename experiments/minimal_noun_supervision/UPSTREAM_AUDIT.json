@@ -1,0 +1,159 @@
+{
+  "repository": "https://github.com/Ocean-kang/Talk2DINO",
+  "commit": "0c155aab1ec2ca59914fef49f597c0345b26e1af",
+  "files_read": {
+    "LICENSE": {
+      "git_blob_sha": "261eeb9e9f8b2b4b0d119366dda99c6fd7d35c64",
+      "sha256": "c71d239df91726fc519c6eb72d318ec65820627232b2f796219e87dcf35d0ab4"
+    },
+    "README.md": {
+      "git_blob_sha": "b410bdfdeb8f610167a79b88184067c4acc37b14",
+      "sha256": "8ca90104c5c082b88c9c3399ba6dcad8379694a7666c774e805465f715b4bd0c"
+    },
+    "configs/vitb_mlp_infonce.yaml": {
+      "git_blob_sha": "5a59c96a9b6d0c1094b391d112b926e4a6ed45f5",
+      "sha256": "b1db6b3847ecd9cb7c77a8a4988bd9423f50cfbedaba24a7a9aa1f97b2e1558e"
+    },
+    "dino_extraction_v2.py": {
+      "git_blob_sha": "3c7be6965df6663d94409d488db66820ed19efc2",
+      "sha256": "05b6b237f88afbff40493032382568066a024936838558f38f199d27f9959962"
+    },
+    "experiments/local_cocu_talk2dino_new_train/run_original_baseline_5seeds.sh": {
+      "git_blob_sha": "83eb2bdbb534f9281ef55efa22c86b4bae37dbc2",
+      "sha256": "47ae8c1d287ca1facfd0cadb6fddaddac7361f47314f973ab56a0edc5065c226"
+    },
+    "experiments/projector_semi_orthogonal/run_segmentation_eval.sh": {
+      "git_blob_sha": "525e03214e670602440198c49bd5f87da9175080",
+      "sha256": "8f7c0e7d64b2b4438182244239b4820639dad42279b722b89573888142ce3a09"
+    },
+    "requirements.txt": {
+      "git_blob_sha": "1a3f375eac080b85bbcd5c45ecda033ba7ad241d",
+      "sha256": "9f16b7d2abfd2562c4c4fc2020fe2490598bb4fa4f8f528909e2e4d7faef127b"
+    },
+    "src/dataset.py": {
+      "git_blob_sha": "cf1f5ab36b685caa311b22affa86f71a811fbc8f",
+      "sha256": "bc7ae2dbfe0244b2ff210921ec09b8b561cd927230b058de6e61e5e8866a5bec"
+    },
+    "src/hooks.py": {
+      "git_blob_sha": "43979855327b258b893874aadf7fe3abb0265f84",
+      "sha256": "db1576afece693930d7b1a4b5453781a44a92c82f39f2086c6b9029f16db48d9"
+    },
+    "src/loss.py": {
+      "git_blob_sha": "8cf4d048888966fc91df16fc4212c8e562f6b12a",
+      "sha256": "350cf5b07db5a41776242ce587bbe5be98691dce8f2d47c422ef8351185c84e4"
+    },
+    "src/model.py": {
+      "git_blob_sha": "581f971d38b23e900e0471dad85c6a52e2a79a0b",
+      "sha256": "572c31d2b19cf38c9ace530945d1db4720386156ec3a3c93eda53db4adf034f6"
+    },
+    "src/open_vocabulary_segmentation/configs/ade/dinotext_ade_vitb_mlp_infonce.yml": {
+      "git_blob_sha": "42b3e02e7a40857e30188bb2c22b6f183a3bb7b4",
+      "sha256": "20175b4df052788c2d9b60f1e423e2a9cbf84bca3539af66167797cabdfc2697"
+    },
+    "src/open_vocabulary_segmentation/configs/ade/eval_ade_pamr.yml": {
+      "git_blob_sha": "376c3feb52a8591b9a8114f3ef2db84780910488",
+      "sha256": "7b40473207630ae065df1c85629411091dcef1da30040895ce8ffeb2eadf2f61"
+    },
+    "src/open_vocabulary_segmentation/configs/context/dinotext_context_vitb_mlp_infonce.yml": {
+      "git_blob_sha": "42b3e02e7a40857e30188bb2c22b6f183a3bb7b4",
+      "sha256": "20175b4df052788c2d9b60f1e423e2a9cbf84bca3539af66167797cabdfc2697"
+    },
+    "src/open_vocabulary_segmentation/configs/context/eval_context_pamr.yml": {
+      "git_blob_sha": "0bacab44b3284f03bd384234321c496ecfaa4333",
+      "sha256": "276cb22b1f95b14c0b031beb8d53167096edeacda2c9755aa8ee719183ccaa8e"
+    },
+    "src/open_vocabulary_segmentation/configs/stuff/dinotext_stuff_vitb_mlp_infonce.yml": {
+      "git_blob_sha": "42b3e02e7a40857e30188bb2c22b6f183a3bb7b4",
+      "sha256": "20175b4df052788c2d9b60f1e423e2a9cbf84bca3539af66167797cabdfc2697"
+    },
+    "src/open_vocabulary_segmentation/configs/stuff/eval_stuff_pamr.yml": {
+      "git_blob_sha": "b8008cd73c0f120288b23bbee86170096005a78d",
+      "sha256": "d6043d83676fcb498e966fbaa0b90f68be3eed46dbb7002e3d332e13a69d9cb6"
+    },
+    "src/open_vocabulary_segmentation/configs/voc/dinotext_voc_vitb_mlp_infonce.yml": {
+      "git_blob_sha": "42b3e02e7a40857e30188bb2c22b6f183a3bb7b4",
+      "sha256": "20175b4df052788c2d9b60f1e423e2a9cbf84bca3539af66167797cabdfc2697"
+    },
+    "src/open_vocabulary_segmentation/configs/voc/eval_voc.yml": {
+      "git_blob_sha": "7c3e87c36654fb78c7a6089cbcd631cd5522a1bb",
+      "sha256": "40e7188a402f097947a88d7c164042edd8c5f7d8240fd4273b66a37548bb15b3"
+    },
+    "src/open_vocabulary_segmentation/configs/voc/eval_voc_pamr.yml": {
+      "git_blob_sha": "37befa1ba44f62b1eb6298feb1cc9d8e4468a538",
+      "sha256": "7e51a111a94c5d05471bc554d1c94422fad259cd0428108421b6168d46094ea8"
+    },
+    "src/open_vocabulary_segmentation/configs/voc_bg/dinotext_voc_bg_vitb_mlp_infonce.yml": {
+      "git_blob_sha": "60b099b6728501c263ab65e6b99d111ba20cc320",
+      "sha256": "cccb755ec69c439bdfcc274d8a4fc0ca8eae028c8d3521a675fcf369361febd6"
+    },
+    "src/open_vocabulary_segmentation/configs/voc_bg/eval_voc_bg_pamr.yml": {
+      "git_blob_sha": "e4b32deafc7290e0589ead7cbb3cf51b33422ff4",
+      "sha256": "6399ca6ecf15498720b48f3c8ddc5b784170ffcb1577a598d4ecec2be5079dfa"
+    },
+    "src/open_vocabulary_segmentation/main.py": {
+      "git_blob_sha": "a19c80104d7e3c98eaed255c8f53aae1bdb42ff5",
+      "sha256": "dc5e7bd5363b02fffa8d675b52cfaf4a64a91fe44efbaba694693050dacc23b1"
+    },
+    "src/train_util.py": {
+      "git_blob_sha": "2f09e9ab833dcfee95b75c0160d667a7786971e0",
+      "sha256": "4cf88c609c6e9c08db5a36c19b1e73c8e612a3da887dfe5a6f4f03aa030d0263"
+    },
+    "text_features_extraction.py": {
+      "git_blob_sha": "75b8a0ffa01a527181d35589419f93b6c119f7dd",
+      "sha256": "b9932a19227f80650160314b578b4066b29abbd066db017684f8bc578fa1d6e1"
+    },
+    "train.py": {
+      "git_blob_sha": "8e39ab6ab88a096ecbbaef0d9704da53f914270e",
+      "sha256": "38793ca243d1bec4f99650cd594cc6329942452689da384315d9f44052b4d601"
+    }
+  },
+  "delivery": "local addon only; no GitHub writes",
+  "revision": "gallery_only_existing_environment",
+  "confirmed_default_branch_commit": "0c155aab1ec2ca59914fef49f597c0345b26e1af",
+  "additional_audit": {
+    "experiments/Head_caption_S5_Editing/editing.py": {
+      "sha256": "5f9d7f8c06971fbdb0d9114a1ecce6e4afd9e190ed81a08185eeea96068bc256",
+      "source_url": "https://github.com/Ocean-kang/Talk2DINO/blob/0c155aab1ec2ca59914fef49f597c0345b26e1af/experiments/Head_caption_S5_Editing/editing.py"
+    },
+    "experiments/Head_caption_S5_Editing/select.py": {
+      "sha256": "9ee0fa17c1614a3321767f0721b2e45d961e5beea1dfeea62274f1d3a8fdd9d9",
+      "source_url": "https://github.com/Ocean-kang/Talk2DINO/blob/0c155aab1ec2ca59914fef49f597c0345b26e1af/experiments/Head_caption_S5_Editing/select.py"
+    },
+    "experiments/local_cocu/extract_candidate_concepts.py": {
+      "sha256": "bf20215425700e1d9d4f7cfe9c58ba7a5fafb1088ca83b671ee379a053da9c75",
+      "source_url": "https://github.com/Ocean-kang/Talk2DINO/blob/0c155aab1ec2ca59914fef49f597c0345b26e1af/experiments/local_cocu/extract_candidate_concepts.py"
+    },
+    "experiments/local_cocu/extract_head_features.py": {
+      "sha256": "15381943a3c70dd6e405c86f90d94ee5751f26fc5268b1a503cbec2ca11d5da5",
+      "source_url": "https://github.com/Ocean-kang/Talk2DINO/blob/0c155aab1ec2ca59914fef49f597c0345b26e1af/experiments/local_cocu/extract_head_features.py"
+    },
+    "experiments/local_cocu/match_head_concepts.py": {
+      "sha256": "f1580cbd7bb6ff1b9349d0cd3bea95aebb4f1b012942b38e751016b52be55c84",
+      "source_url": "https://github.com/Ocean-kang/Talk2DINO/blob/0c155aab1ec2ca59914fef49f597c0345b26e1af/experiments/local_cocu/match_head_concepts.py"
+    },
+    "experiments/local_cocu/utils/concept_utils.py": {
+      "sha256": "ce1b75abff797c78b8ed7d6bcf8422740a704c778a4bede8df5577d35f455048",
+      "source_url": "https://github.com/Ocean-kang/Talk2DINO/blob/0c155aab1ec2ca59914fef49f597c0345b26e1af/experiments/local_cocu/utils/concept_utils.py"
+    },
+    "experiments/local_cocu_novel/filter_novel.py": {
+      "sha256": "bff15564387fde6b05bdaa23bd0aac9d208d2194b68374b948c902cef23c60d7",
+      "source_url": "https://github.com/Ocean-kang/Talk2DINO/blob/0c155aab1ec2ca59914fef49f597c0345b26e1af/experiments/local_cocu_novel/filter_novel.py"
+    },
+    "experiments/local_cocu_novel/pipeline.py": {
+      "sha256": "d58779f91d42bf90b28a446e66dd678110c04a487ee80d8591cd382597a31f89",
+      "source_url": "https://github.com/Ocean-kang/Talk2DINO/blob/0c155aab1ec2ca59914fef49f597c0345b26e1af/experiments/local_cocu_novel/pipeline.py"
+    },
+    "experiments/local_cocu_talk2dino/common/candidates.py": {
+      "sha256": "890ab344f6e563a0dc84ee4cd8c8772fc63d11c597edf6d957f5e7db10c5d0fe",
+      "source_url": "https://github.com/Ocean-kang/Talk2DINO/blob/0c155aab1ec2ca59914fef49f597c0345b26e1af/experiments/local_cocu_talk2dino/common/candidates.py"
+    },
+    "experiments/local_cocu_talk2dino/common/data.py": {
+      "sha256": "c90323ea37f385f9d6f1f307de68b8dc2708eec2542fe68c2e1a885121ef94ba",
+      "source_url": "https://github.com/Ocean-kang/Talk2DINO/blob/0c155aab1ec2ca59914fef49f597c0345b26e1af/experiments/local_cocu_talk2dino/common/data.py"
+    },
+    "experiments/local_cocu_talk2dino/common/teacher.py": {
+      "sha256": "b120be837af36235662fa084289fec997cffbb79ab08ef58ab3956767795f2ae",
+      "source_url": "https://github.com/Ocean-kang/Talk2DINO/blob/0c155aab1ec2ca59914fef49f597c0345b26e1af/experiments/local_cocu_talk2dino/common/teacher.py"
+    }
+  }
+}

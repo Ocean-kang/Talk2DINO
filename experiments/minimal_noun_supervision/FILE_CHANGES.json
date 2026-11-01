@@ -1,0 +1,112 @@
+{
+  "unchanged": [
+    "experiments/minimal_noun_supervision/cne/README.md",
+    "experiments/minimal_noun_supervision/cne/run.sh",
+    "experiments/minimal_noun_supervision/cnp/README.md",
+    "experiments/minimal_noun_supervision/cnp/run.sh",
+    "experiments/minimal_noun_supervision/common/__init__.py",
+    "experiments/minimal_noun_supervision/common/data.py",
+    "experiments/minimal_noun_supervision/common/io.py",
+    "experiments/minimal_noun_supervision/hvne/README.md",
+    "experiments/minimal_noun_supervision/hvne/run.sh",
+    "experiments/minimal_noun_supervision/json_to_pth.py",
+    "experiments/minimal_noun_supervision/scripts/eval_five_seeds.sh",
+    "experiments/minimal_noun_supervision/scripts/eval_one.sh",
+    "experiments/minimal_noun_supervision/scripts/train_five_seeds.sh",
+    "experiments/minimal_noun_supervision/scripts/train_one.sh",
+    "experiments/minimal_noun_supervision/summarize.py",
+    "experiments/minimal_noun_supervision/tests/test_evaluate.py"
+  ],
+  "modified": [
+    {
+      "path": "experiments/minimal_noun_supervision/README.md",
+      "previous_sha256": "50be642176482b139c8e18a9802d85defca3351da9c6f08a7e00440760099ec0",
+      "current_sha256": "6854543e2a7d6e2818f88458dd1d474d69ab51468716db2b73ac82abe4db36da"
+    },
+    {
+      "path": "experiments/minimal_noun_supervision/UPSTREAM_AUDIT.json",
+      "previous_sha256": "9dd9b34fcdb2df0355694f986d28a2d65efcf59ae6108f6fae9587e8e92cf736",
+      "current_sha256": "57e7c306dc918a5d6e91ab75aa46b4b2e68ee8a7da86168382b830c8f7245023"
+    },
+    {
+      "path": "experiments/minimal_noun_supervision/VALIDATION.md",
+      "previous_sha256": "1954f82094eb62282c4c4a9974bcf6219a5c44f1336007866d2e633b887dc237",
+      "current_sha256": "08c0980a1eb331b4bef3d0f76036a89036d67b4aa0e67c1af9978574a894954a"
+    },
+    {
+      "path": "experiments/minimal_noun_supervision/audit_heads.py",
+      "previous_sha256": "4641a97fa2194d47ebee20f7a4888685453cb4eb617997275aa5a2a2d06d5e72",
+      "current_sha256": "f7ba83695e21702601953285aa7c42db702683a7023dc94792d5772082e79054"
+    },
+    {
+      "path": "experiments/minimal_noun_supervision/check_environment.py",
+      "previous_sha256": "0fb35334eab347d4e275a090ca9ec3faafba634407d2be71b7a549608f5ab421",
+      "current_sha256": "ad7c445ba0fb3239088c28436dfca3d1d2aae93d9a6e484161d1e6489e8c3645"
+    },
+    {
+      "path": "experiments/minimal_noun_supervision/common/nouns.py",
+      "previous_sha256": "a6e47322faca5689a6b1f12eb83d4123ffce2a35af2e9baa55e309f029ddc18e",
+      "current_sha256": "4d588534267c2208a8c738e91c7c2e7b98c70cd6b6140c5107885416ce494773"
+    },
+    {
+      "path": "experiments/minimal_noun_supervision/common/selection.py",
+      "previous_sha256": "3ac265abdb173b35e04fe48bdb89b84409d85cdffd6918dc61645756103f07ab",
+      "current_sha256": "6872428b2803d67ef35ec94505a278890fb566c64fcbee7b5bb1b1963d813039"
+    },
+    {
+      "path": "experiments/minimal_noun_supervision/evaluate.py",
+      "previous_sha256": "31176bec5d6e66c4bcdf1092255de91fd24243887554fb5f4c07cad138fb4f0d",
+      "current_sha256": "791a16edb4dbeec51bfbdc702d628afaffd879331ba4a7a96162dbf53856bfd8"
+    },
+    {
+      "path": "experiments/minimal_noun_supervision/prepare.py",
+      "previous_sha256": "559f27ed8071b79d55e7848a308f87e3047cf7b03b94165a7bfef0c70c01d0a4",
+      "current_sha256": "62d754a3a4fe4e738e4120481c908c1abbb4445b263b3e357da4d9f5a9ce2b3a"
+    },
+    {
+      "path": "experiments/minimal_noun_supervision/scripts/01_prepare.sh",
+      "previous_sha256": "a412d7649467736d15bff751f4a3c73178e9ee8efa3944fa52f321a12ef6e0d9",
+      "current_sha256": "52c870a82ba58385b12aae7528e44a0f0c30ee017e0132865b7942157567af29"
+    },
+    {
+      "path": "experiments/minimal_noun_supervision/scripts/02_select_hvne.sh",
+      "previous_sha256": "81df404ce82850990866768bca7e088a84e83af930901bd0455cbd9ab90edd9a",
+      "current_sha256": "64588d768a91b32973353044594a532ddefcd7dafa3e77bfe7822d1c4b6f37b4"
+    },
+    {
+      "path": "experiments/minimal_noun_supervision/scripts/env.sh",
+      "previous_sha256": "3de141af1d2b1efd3124d48c5c9fdbde2552ce1872cd59a6fefa2eab283dc860",
+      "current_sha256": "f22f94db68a485d47e7411f06f45498605cb26e114d994efb00bc896560dfca5"
+    },
+    {
+      "path": "experiments/minimal_noun_supervision/select_hvne.py",
+      "previous_sha256": "9f37241efd36297cbf4e79dff8ea0179c1de79b78f75d8bdad41bf827d9bcc11",
+      "current_sha256": "b6a9e2addaf818f3b73cfc7f4d6cf44863553b95cb622319c39c12e17b97926f"
+    },
+    {
+      "path": "experiments/minimal_noun_supervision/tests/test_core.py",
+      "previous_sha256": "4f691314d8b6a6800bca70c5d86779f2d578828c3e4f476f1234e1768165a52c",
+      "current_sha256": "adea1adccd004ab252c87098d0fd6c435c20fba850816a2b6715d189042ee63a"
+    },
+    {
+      "path": "experiments/minimal_noun_supervision/tests/test_integration.py",
+      "previous_sha256": "8d7575c23aded3b124df995eebff651438c02371950e41b3c574375e1466b6f5",
+      "current_sha256": "a742d076664e4d384dfdd33a46a8cb9531ea3b41b43fb94285c5f2cf56b3c3a2"
+    },
+    {
+      "path": "experiments/minimal_noun_supervision/train.py",
+      "previous_sha256": "6972f3a1d5c5e0be4bad8ec4c6a2de1ab42c719588ad47aa97aefd4c05ecbb5c",
+      "current_sha256": "eb9eb851a44f257c3f1e86c98049d515bf2daf2b66fd9a01c0bdb08d1427ff2d"
+    }
+  ],
+  "added": [
+    "experiments/minimal_noun_supervision/CHANGES.md",
+    "experiments/minimal_noun_supervision/adopt_text_cache.py",
+    "experiments/minimal_noun_supervision/common/cache.py",
+    "experiments/minimal_noun_supervision/offline_guard/sitecustomize.py",
+    "experiments/minimal_noun_supervision/record_feature_metadata.py"
+  ],
+  "removed": [
+    "experiments/minimal_noun_supervision/requirements-extra.txt"
+  ]
+}
