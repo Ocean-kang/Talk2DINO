@@ -1,0 +1,17 @@
+{
+  "repository": "https://github.com/Ocean-kang/Talk2DINO",
+  "commit": "0c155aab1ec2ca59914fef49f597c0345b26e1af",
+  "source_sha256": {
+    "src/model.py": "572c31d2b19cf38c9ace530945d1db4720386156ec3a3c93eda53db4adf034f6",
+    "src/loss.py": "350cf5b07db5a41776242ce587bbe5be98691dce8f2d47c422ef8351185c84e4",
+    "src/train_util.py": "4cf88c609c6e9c08db5a36c19b1e73c8e612a3da887dfe5a6f4f03aa030d0263",
+    "src/dataset.py": "bc7ae2dbfe0244b2ff210921ec09b8b561cd927230b058de6e61e5e8866a5bec",
+    "src/hooks.py": "db1576afece693930d7b1a4b5453781a44a92c82f39f2086c6b9029f16db48d9",
+    "dino_extraction_v2.py": "05b6b237f88afbff40493032382568066a024936838558f38f199d27f9959962",
+    "configs/vitb_mlp_infonce.yaml": "b1db6b3847ecd9cb7c77a8a4988bd9423f50cfbedaba24a7a9aa1f97b2e1558e",
+    "experiments/local_cocu_novel/filter_novel.py": "379e8fe751b759516b0bab6164fc19e72e26817e844eefdc745c4809185fa6d5",
+    "experiments/local_cocu/utils/concept_utils.py": "7e0e2a6fc19634fd6ff943f39bc06fdaf292f41a399daa3ec7bdeee28c0f9f13",
+    "src/open_vocabulary_segmentation/main.py": "dc5e7bd5363b02fffa8d675b52cfaf4a64a91fe44efbaba694693050dacc23b1"
+  },
+  "mutations": "New experiments/ecca files only; no upstream or GitHub writes"
+}
