@@ -1,0 +1,27 @@
+{
+  "meta": {
+    "description": "Example only. Replace with real F5/CoCu/Bootstrap output."
+  },
+  "images": [
+    {
+      "image_id": 122688,
+      "curated": [
+        {
+          "concept": "helmet",
+          "score": 0.91,
+          "best_head": 3
+        },
+        {
+          "concept": "bouquet",
+          "score": 0.83,
+          "best_head": 7
+        },
+        {
+          "concept": "street",
+          "score": 0.74,
+          "best_head": 1
+        }
+      ]
+    }
+  ]
+}

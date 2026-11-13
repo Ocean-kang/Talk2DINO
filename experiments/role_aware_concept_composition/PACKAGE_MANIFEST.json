@@ -1,0 +1,13 @@
+{
+  "name": "role_aware_concept_composition",
+  "version": "0.1.0",
+  "entrypoint": "python -m role_aware_concept_composition.build_ra_c2c",
+  "dependencies": [
+    "Python >= 3.9",
+    "existing Talk2DINO PyTorch environment",
+    "existing OpenAI CLIP package"
+  ],
+  "llm_used": false,
+  "spacy_used": false,
+  "model_or_dataset_downloads": false
+}
