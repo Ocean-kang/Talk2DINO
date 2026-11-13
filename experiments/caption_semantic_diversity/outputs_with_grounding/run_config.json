@@ -1,0 +1,29 @@
+{
+  "captions_json": "/mnt/sda/master/code/oymk/Talking2dino/Talk2DINO/data/coco2014_subset_50k/5k_rich_diversity.json",
+  "captions_json_sha256": "b3b625694561a9074eff5a85f28c85f0980e07935c19293ab359a82d20def026",
+  "num_images": 5000,
+  "captions_per_method_per_image": 5,
+  "methods": {
+    "raw": "raw_captions",
+    "rich": "rich_captions",
+    "rich_weaken": "rich_weaken_captions",
+    "rich_diversity": "rich_diversity_captions"
+  },
+  "clip_model": "ViT-B/16",
+  "clip_weight_source": "/home/master/.cache/clip/ViT-B-16.pt",
+  "device": "cuda",
+  "batch_size": 128,
+  "bootstrap_iterations": 10000,
+  "seed": 42,
+  "image_grounding_enabled": true,
+  "image_dir": "/mnt/sda/master/dataset/oymk/mscoco14/coco/train2014",
+  "image_pattern": "COCO_train2014_{image_id:012d}.jpg",
+  "timestamp_local": "2026-11-12 18:44:39",
+  "metric_definitions": {
+    "cisd": "1 - mean cosine similarity over the 10 unordered caption pairs; higher means more separated.",
+    "nn_redundancy": "Mean over captions of the maximum cosine similarity to another caption; lower means less local duplication.",
+    "effective_rank_norm": "exp(entropy of squared singular-value spectrum of centered 5x512 embeddings) / 4.",
+    "grounding_mean": "Mean cosine similarity between the image embedding and the five caption embeddings.",
+    "grounding_min": "Minimum image-caption cosine similarity within the five captions."
+  }
+}

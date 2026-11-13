@@ -1,0 +1,5 @@
+﻿term,coefficient,interpretation
+rich_vs_raw_adjusted,0.12267560108751101,"Adjusted CISD difference vs Raw, controlling for mean CLIP token length"
+rich_weaken_vs_raw_adjusted,0.002046738520510164,"Adjusted CISD difference vs Raw, controlling for mean CLIP token length"
+rich_diversity_vs_raw_adjusted,0.17552706674886814,"Adjusted CISD difference vs Raw, controlling for mean CLIP token length"
+clip_token_length_slope,-0.0018774840572976061,CISD change per additional mean CLIP content token
