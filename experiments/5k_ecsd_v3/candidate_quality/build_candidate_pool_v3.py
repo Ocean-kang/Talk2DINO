@@ -1,0 +1,395 @@
+#!/usr/bin/env python3
+"""Build a deduplicated, source-traceable ECSD v3 candidate pool from Raw Captions only."""
+import argparse
+import hashlib
+import json
+import re
+import sys
+from collections import Counter
+from pathlib import Path
+
+HERE = Path(__file__).resolve().parent
+PKG_ROOT = HERE.parent
+sys.path.insert(0, str(PKG_ROOT))
+
+from candidate_quality.semantic_role_classifier import (
+    ACTION_TERMS, ATTRIBUTE_TERMS, ENTITY_TERMS, WORD_RE,
+    classify_semantic_roles, content_tokens, quality_flags,
+)
+from config_utils import load_config
+from utils.safe_io import atomic_write_csv, atomic_write_json, atomic_write_jsonl
+from utils.text_utils import canonical_surface_text
+
+DETERMINERS = {"a", "an", "the", "this", "that", "these", "those", "some"}
+PREPOSITIONS = {
+    "in", "on", "at", "to", "from", "for", "by", "as", "into", "onto",
+    "with", "without", "over", "under", "above", "below", "near", "beside",
+    "behind", "between", "around", "through", "across", "along", "inside", "outside", "of",
+}
+CLAUSE_MARKERS = {"and", "or", "but", "while", "which", "who", "that"}
+AUXILIARIES = {"is", "are", "was", "were", "be", "been", "being", "has", "have", "had"}
+TYPE_PRIORITY = {"original": 0, "clause": 1, "noun_phrase": 2}
+
+
+def sentence_form(text):
+    text = re.sub(r"\s+", " ", str(text).strip(" \t\r\n,;:.!?"))
+    if not text:
+        return ""
+    text = text[0].upper() + text[1:]
+    return text if text[-1] in ".!?" else text + "."
+
+
+def trim_span(text, start, end):
+    while start < end and (text[start].isspace() or text[start] in ",;:.!?\"'()[]{}"):
+        start += 1
+    while end > start and (text[end - 1].isspace() or text[end - 1] in ",;:.!?\"'()[]{}"):
+        end -= 1
+    changed = True
+    while changed and start < end:
+        changed = False
+        prefix = re.match(r"(?i)\s*([A-Za-z]+)\b", text[start:end])
+        if prefix and prefix.group(1).lower() in CLAUSE_MARKERS | PREPOSITIONS:
+            start += prefix.end()
+            while start < end and text[start].isspace():
+                start += 1
+            changed = True
+        suffix = re.search(r"(?i)\b([A-Za-z]+)\s*$", text[start:end])
+        if suffix and suffix.group(1).lower() in CLAUSE_MARKERS | PREPOSITIONS:
+            end = start + suffix.start()
+            while end > start and text[end - 1].isspace():
+                end -= 1
+            changed = True
+    return start, end, text[start:end].strip()
+
+
+def has_action(text):
+    return bool({x.lower() for x in WORD_RE.findall(text)} & ACTION_TERMS)
+
+
+def clause_segments(caption):
+    """Yield punctuation/conjunction fragments; caller rejects full-caption spans."""
+    for match in re.finditer(r"[^,;:.!?]+", caption):
+        raw = match.group(0)
+        left_trim = len(raw) - len(raw.lstrip())
+        start = match.start() + left_trim
+        end = match.start() + len(raw.rstrip())
+        segment = caption[start:end]
+        if not segment:
+            continue
+        split_points = []
+        for conj in re.finditer(r"\b(?:and|while|but)\b", segment, flags=re.I):
+            left = segment[:conj.start()].strip()
+            right = segment[conj.end():].strip()
+            if left and right and has_action(left) and has_action(right):
+                split_points.append((start + conj.start(), start + conj.end()))
+        if not split_points:
+            yield start, end
+            continue
+        cursor = start
+        for a, b in split_points:
+            if a > cursor:
+                yield cursor, a
+            cursor = b
+        if cursor < end:
+            yield cursor, end
+
+
+def candidate_id_for(image_id, canonical_text):
+    digest = hashlib.sha1(canonical_text.encode("utf-8")).hexdigest()[:14]
+    return "img{}_{}".format(int(image_id), digest)
+
+
+def _make_record(caption_index, caption, start, end, candidate_type, filter_config):
+    start, end, span_text = trim_span(caption, start, end)
+    if not span_text:
+        return None
+    if candidate_type == "noun_phrase":
+        text = sentence_form("A photo shows " + span_text[0].lower() + span_text[1:])
+    else:
+        text = sentence_form(span_text)
+    canonical = canonical_surface_text(text)
+    if not canonical:
+        return None
+    facts = sorted(content_tokens(text))
+    if not facts:
+        return None
+    role_info = classify_semantic_roles(text)
+    flags = quality_flags(text, candidate_type, filter_config)
+    return {
+        "canonical_text": canonical,
+        "text": text,
+        "candidate_type": candidate_type,
+        "candidate_origins": [candidate_type],
+        "source_caption_ids": [int(caption_index)],
+        "source_spans": [{
+            "caption_index": int(caption_index),
+            "start": int(start),
+            "end": int(end),
+            "text": span_text,
+            "extraction_type": candidate_type,
+        }],
+        "facts": facts,
+        "categories": role_info["categories"],
+        "category_rules": role_info["rules"],
+        "quality_flags": flags,
+        "heuristic_valid": not flags,
+    }
+
+
+def _merge_duplicate(existing, incoming):
+    """Merge source evidence; keep representative type by explicit priority."""
+    existing["candidate_origins"] = sorted(
+        set(existing.get("candidate_origins", [])) | set(incoming.get("candidate_origins", [])),
+        key=lambda x: TYPE_PRIORITY.get(x, 99),
+    )
+    spans = existing.get("source_spans", []) + incoming.get("source_spans", [])
+    unique = {}
+    for span in spans:
+        key = (span["caption_index"], span["start"], span["end"], span["extraction_type"], span["text"])
+        unique[key] = span
+    existing["source_spans"] = [unique[k] for k in sorted(unique)]
+    existing["source_caption_ids"] = sorted({x["caption_index"] for x in existing["source_spans"]})
+    if TYPE_PRIORITY[incoming["candidate_type"]] < TYPE_PRIORITY[existing["candidate_type"]]:
+        keep_spans = existing["source_spans"]
+        keep_origins = existing["candidate_origins"]
+        existing.update(incoming)
+        existing["source_spans"] = keep_spans
+        existing["source_caption_ids"] = sorted({x["caption_index"] for x in keep_spans})
+        existing["candidate_origins"] = keep_origins
+    return existing
+
+
+def build_candidates(raw_captions, image_id, config=None):
+    config = config or {}
+    construction = config.get("candidate_construction", {})
+    filter_config = config.get("candidate_filter", {})
+    min_clause_tokens = int(construction.get("min_clause_content_tokens", 3))
+    max_np_tokens = int(construction.get("max_np_tokens", 8))
+    min_np_tokens = int(construction.get("min_np_content_tokens", 1))
+    max_candidates = int(construction.get("max_candidates_per_image", 200))
+    if not isinstance(raw_captions, list) or len(raw_captions) != 5:
+        raise ValueError("image_id={} must have exactly five Raw Captions".format(image_id))
+    captions = [str(x) for x in raw_captions]
+    if not all(x.strip() for x in captions):
+        raise ValueError("image_id={} has an empty Raw Caption".format(image_id))
+
+    merged = {}
+    raw_record_count = 0
+    full_clause_rejected = 0
+
+    def add(index, caption, start, end, kind):
+        nonlocal raw_record_count
+        record = _make_record(index, caption, start, end, kind, filter_config)
+        if record is None:
+            return
+        raw_record_count += 1
+        key = record.pop("canonical_text")
+        if key in merged:
+            _merge_duplicate(merged[key], record)
+        else:
+            merged[key] = record
+
+    # Original evidence has first priority. Duplicate Raw Captions are merged, not dropped.
+    for index, caption in enumerate(captions):
+        add(index, caption, 0, len(caption), "original")
+
+    for index, caption in enumerate(captions):
+        for start, end in clause_segments(caption):
+            start, end, fragment = trim_span(caption, start, end)
+            if not fragment:
+                continue
+            # Strict subspan: an entire caption is never relabelled as a Clause.
+            if canonical_surface_text(fragment) == canonical_surface_text(caption):
+                full_clause_rejected += 1
+                continue
+            if start == 0 and end == len(caption):
+                full_clause_rejected += 1
+                continue
+            first = WORD_RE.search(fragment)
+            if not first or first.group(0).lower() in CLAUSE_MARKERS:
+                continue
+            if first.group(0).lower() in ACTION_TERMS:
+                continue
+            if len(content_tokens(fragment)) >= min_clause_tokens:
+                add(index, caption, start, end, "clause")
+
+        tokens = list(WORD_RE.finditer(caption))
+        for idx, token in enumerate(tokens):
+            if token.group(0).lower() not in DETERMINERS:
+                continue
+            end_idx = idx + 1
+            while end_idx < len(tokens) and (end_idx - idx) <= max_np_tokens:
+                word = tokens[end_idx].group(0).lower()
+                gap = caption[tokens[end_idx - 1].end():tokens[end_idx].start()]
+                if re.search(r"[,;:.!?]", gap):
+                    break
+                if word in PREPOSITIONS | CLAUSE_MARKERS | ACTION_TERMS | AUXILIARIES | DETERMINERS:
+                    break
+                end_idx += 1
+            if end_idx <= idx + 1:
+                continue
+            last = tokens[end_idx - 1]
+            phrase = caption[token.start():last.end()]
+            facts = content_tokens(phrase)
+            if len(facts) < min_np_tokens:
+                continue
+            if len(facts) == 1 and not (facts & ENTITY_TERMS):
+                continue
+            if not facts or facts <= ATTRIBUTE_TERMS:
+                continue
+            add(index, caption, token.start(), last.end(), "noun_phrase")
+
+    # Stable, explicit type priority and stable text ordering.
+    ordered = sorted(
+        merged.items(),
+        key=lambda kv: (TYPE_PRIORITY.get(kv[1]["candidate_type"], 99), kv[0]),
+    )
+    if max_candidates > 0 and len(ordered) > max_candidates:
+        # Keep all unique originals first, then deterministically truncate derived candidates.
+        originals = [x for x in ordered if x[1]["candidate_type"] == "original"]
+        derived = [x for x in ordered if x[1]["candidate_type"] != "original"]
+        ordered = originals + derived[:max(0, max_candidates - len(originals))]
+
+    candidates = []
+    for canonical, record in ordered:
+        source_facts = set()
+        for span in record["source_spans"]:
+            source_facts.update(content_tokens(span["text"]))
+        unsupported = sorted(set(record["facts"]) - source_facts)
+        record["candidate_id"] = candidate_id_for(image_id, canonical)
+        record["unsupported_content_tokens"] = unsupported
+        record["role"] = (
+            record["categories"][0] if len(record["categories"]) == 1
+            else "multi" if record["categories"] != ["Unknown"] else "Unknown"
+        )
+        candidates.append(record)
+
+    ids = [x["candidate_id"] for x in candidates]
+    texts = [canonical_surface_text(x["text"]) for x in candidates]
+    if len(ids) != len(set(ids)):
+        raise AssertionError("candidate_id collision for image_id={}".format(image_id))
+    if len(texts) != len(set(texts)):
+        raise AssertionError("surface duplicate survived dedup for image_id={}".format(image_id))
+    return candidates, {
+        "raw_candidate_records_before_dedup": raw_record_count,
+        "unique_candidates_after_dedup": len(candidates),
+        "merged_duplicate_records": raw_record_count - len(candidates),
+        "full_caption_clause_rejected": full_clause_rejected,
+    }
+
+
+def main():
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument("--input", default="data/coco2014_subset_50k/5k_rich_diversity.json")
+    parser.add_argument("--output", default="outputs/5k_ecsd_v3/candidates/ecsd_v3_candidates.jsonl")
+    parser.add_argument("--summary", default="outputs/5k_ecsd_v3/candidates/candidate_pool_summary.json")
+    parser.add_argument("--config", default="experiments/5k_ecsd_v3/configs/default.json")
+    parser.add_argument("--expected-images", type=int, default=5000)
+    parser.add_argument("--overwrite", action="store_true")
+    args = parser.parse_args()
+
+    source_rows = json.loads(Path(args.input).read_text(encoding="utf-8"))
+    if not isinstance(source_rows, list):
+        raise ValueError("Source caption JSON must be a list")
+    if args.expected_images and len(source_rows) != args.expected_images:
+        raise ValueError("Expected {} images, found {}".format(args.expected_images, len(source_rows)))
+    image_ids = [int(x["image_id"]) for x in source_rows]
+    if len(image_ids) != len(set(image_ids)):
+        raise ValueError("Source caption JSON contains duplicate image IDs")
+
+    config = load_config(args.config)
+    configured_priority = config.get("candidate_type_priority", ["original", "clause", "noun_phrase"])
+    if configured_priority != ["original", "clause", "noun_phrase"]:
+        raise ValueError("ECSD v3 candidate type priority is fixed: Original > Clause > Noun Phrase")
+    pool_rows = []
+    type_counts = Counter()
+    role_counts = Counter()
+    quality_counts = Counter()
+    invalid_count = unsupported_count = 0
+    content_token_total = sentence_token_total = 0
+    total_raw_records = total_candidates = merged_duplicates = full_clause_rejected = 0
+    candidate_counts = []
+    per_image_rows = []
+    for index, row in enumerate(source_rows):
+        image_id = int(row["image_id"])
+        candidates, diag = build_candidates(row.get("raw_captions"), image_id, config)
+        pool_rows.append({"image_id": image_id, "raw_captions": row["raw_captions"], "candidates": candidates})
+        total_raw_records += diag["raw_candidate_records_before_dedup"]
+        total_candidates += len(candidates)
+        merged_duplicates += diag["merged_duplicate_records"]
+        full_clause_rejected += diag["full_caption_clause_rejected"]
+        candidate_counts.append(len(candidates))
+        image_roles = set()
+        image_invalid = image_unsupported = 0
+        image_type_counts = Counter()
+        for item in candidates:
+            type_counts[item["candidate_type"]] += 1
+            image_type_counts[item["candidate_type"]] += 1
+            role_counts.update(item["categories"])
+            image_roles.update(x for x in item["categories"] if x != "Unknown")
+            quality_counts.update(item["quality_flags"])
+            invalid_count += int(bool(item["quality_flags"]))
+            unsupported_count += int(bool(item["unsupported_content_tokens"]))
+            image_invalid += int(bool(item["quality_flags"]))
+            image_unsupported += int(bool(item["unsupported_content_tokens"]))
+            content_token_total += len(item["facts"])
+            sentence_token_total += len(WORD_RE.findall(item["text"]))
+        per_image_rows.append({
+            "image_id": image_id,
+            "candidate_count": len(candidates),
+            "original_count": image_type_counts["original"],
+            "clause_count": image_type_counts["clause"],
+            "noun_phrase_count": image_type_counts["noun_phrase"],
+            "invalid_candidate_count": image_invalid,
+            "unsupported_candidate_count": image_unsupported,
+            "unique_role_count": len(image_roles),
+            "role_coverage_ratio": len(image_roles) / 5.0,
+            "merged_duplicate_records": diag["merged_duplicate_records"],
+        })
+        if (index + 1) % 500 == 0:
+            print("[v3 candidate pool] {}/{}".format(index + 1, len(source_rows)), flush=True)
+
+    source_sha256 = hashlib.sha256(Path(args.input).read_bytes()).hexdigest()
+    config_sha256 = hashlib.sha256(Path(args.config).read_bytes()).hexdigest()
+    summary = {
+        "version": "ECSD-v3",
+        "source_caption_sha256": source_sha256,
+        "config_sha256": config_sha256,
+        "num_images": len(pool_rows),
+        "raw_candidate_records_before_dedup": total_raw_records,
+        "total_candidates_after_dedup": total_candidates,
+        "merged_duplicate_records": merged_duplicates,
+        "merged_duplicate_ratio_of_extracted_records": merged_duplicates / max(1, total_raw_records),
+        "full_caption_clause_rejected": full_clause_rejected,
+        "mean_candidates_per_image": total_candidates / max(1, len(pool_rows)),
+        "invalid_candidate_count": invalid_count,
+        "invalid_candidate_ratio": invalid_count / max(1, total_candidates),
+        "unsupported_content_candidate_count": unsupported_count,
+        "unsupported_content_candidate_ratio": unsupported_count / max(1, total_candidates),
+        "mean_content_token_count": content_token_total / max(1, total_candidates),
+        "mean_sentence_token_count": sentence_token_total / max(1, total_candidates),
+        "min_candidates_per_image": min(candidate_counts) if candidate_counts else 0,
+        "max_candidates_per_image": max(candidate_counts) if candidate_counts else 0,
+        "candidate_type_counts": dict(type_counts),
+        "role_label_counts": dict(role_counts),
+        "quality_flag_counts": dict(quality_counts),
+        "deduplication": "canonical lowercase alphanumeric surface text; preserves stopwords and order",
+        "type_priority": config.get("candidate_type_priority", ["original", "clause", "noun_phrase"]),
+        "clause_rule": "Clause must be a strict source-caption subspan; full-caption duplicates are rejected",
+        "candidate_id_rule": "image_id + SHA1(canonical surface text) prefix; deterministic within the source image",
+        "source": "raw_captions only",
+        "human_ground_truth": False,
+    }
+    per_image_path = Path(args.summary).with_name("candidate_pool_per_image_v3.csv")
+    per_image_fields = list(per_image_rows[0].keys()) if per_image_rows else []
+    atomic_write_jsonl(args.output, pool_rows, overwrite=args.overwrite)
+    atomic_write_json(args.summary, summary, overwrite=args.overwrite)
+    if per_image_rows:
+        atomic_write_csv(per_image_path, per_image_fields, per_image_rows, overwrite=args.overwrite)
+    print("[DONE] v3 candidate pool:", args.output)
+    print("[DONE] summary:", args.summary)
+    print("[DONE] per-image diagnostics:", per_image_path)
+
+
+if __name__ == "__main__":
+    main()

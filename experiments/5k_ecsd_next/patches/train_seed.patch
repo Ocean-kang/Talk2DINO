@@ -1,0 +1,47 @@
+diff --git a/train.py b/train.py
+index 0000000..0000000 100644
+--- a/train.py
++++ b/train.py
+@@ -21,2 +21,2 @@
+-def train_and_eval(config_file, train_dataset, val_dataset, texts=None, images=None, model_type='cls', test_set=None, optimizer="adam", weight_decay=0.05, scheduler='linear', warmup=0, name_pedix='', save_head_activations=None):
+-    set_seed(123)
++def train_and_eval(config_file, train_dataset, val_dataset, texts=None, images=None, model_type='cls', test_set=None, optimizer="adam", weight_decay=0.05, scheduler='linear', warmup=0, name_pedix='', save_head_activations=None, seed=123):
++    set_seed(seed)
+@@ -43,1 +43,1 @@
+-    model, train_losses, val_losses = do_train(model, train_dataset, val_dataset, config['train'], optimizer_name=optimizer, weight_decay=weight_decay, scheduler_name=scheduler, warmup=warmup, save_head_attivations=save_head_activations)
++    model, train_losses, val_losses = do_train(model, train_dataset, val_dataset, config['train'], seed=seed, optimizer_name=optimizer, weight_decay=weight_decay, scheduler_name=scheduler, warmup=warmup, save_head_attivations=save_head_activations)
+@@ -100,3 +100,4 @@
+     parser.add_argument('--save_head_activations', type=str, default=None, help="If setted the occurences of the head activation of the last epoch will be saved at that path")
++    parser.add_argument('--seed', type=int, default=123, help="Random seed for model initialization and training")
+     parser.add_argument('--warmup', type=int, default=0, help="Number of warmup epochs")
+     args = parser.parse_args()
+@@ -151,2 +152,3 @@
+                    name_pedix=args.name_pedix,
+-                   save_head_activations=args.save_head_activations)
++                   save_head_activations=args.save_head_activations,
++                   seed=args.seed)
+diff --git a/src/train_util.py b/src/train_util.py
+index 2f09e9a..0000000 100644
+--- a/src/train_util.py
++++ b/src/train_util.py
+@@ -27,3 +27,9 @@
+     os.environ['CUBLAS_WORKSPACE_CONFIG'] = ':4096:8'
+
++def seed_worker(worker_id):
++    """Seed Python and NumPy in each DataLoader worker from PyTorch's worker seed."""
++    worker_seed = torch.initial_seed() % (2 ** 32)
++    np.random.seed(worker_seed)
++    random.seed(worker_seed)
++
+ def assign_learning_rate(optimizer, new_lr):
+@@ -168,4 +174,8 @@
+-    train_dataloader = DataLoader(train_dataset, batch_size=batch_size, shuffle=shuffle, num_workers=8)
+-    val_dataloader = DataLoader(val_dataset, batch_size=batch_size, shuffle=False, num_workers=8)
++    train_generator = torch.Generator()
++    train_generator.manual_seed(seed)
++    val_generator = torch.Generator()
++    val_generator.manual_seed(seed + 1)
++    train_dataloader = DataLoader(train_dataset, batch_size=batch_size, shuffle=shuffle, num_workers=8, worker_init_fn=seed_worker, generator=train_generator)
++    val_dataloader = DataLoader(val_dataset, batch_size=batch_size, shuffle=False, num_workers=8, worker_init_fn=seed_worker, generator=val_generator)
+
+     criterion = ContrastiveLoss(model, margin=margin, max_violation=max_violation, ltype=ltype)

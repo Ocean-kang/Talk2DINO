@@ -1,0 +1,43 @@
+{
+  "paths": {
+    "data_dir": "data/coco2014_subset_50k",
+    "source_captions": "data/coco2014_subset_50k/5k_rich_diversity.json",
+    "candidate_pool": "outputs/5k_ecsd_v3/candidates/ecsd_v3_candidates.jsonl",
+    "output_root": "outputs/5k_ecsd_v3",
+    "clip_cache": "~/.cache/clip",
+    "embedding_cache": "outputs/5k_ecsd_v3/clip_cache"
+  },
+  "data": {
+    "expected_images": 5000,
+    "captions_per_image": 5,
+    "manual_audit_images": 100,
+    "manual_audit_seed": 42
+  },
+  "candidate_construction": {
+    "min_clause_content_tokens": 3,
+    "max_np_tokens": 8,
+    "min_np_content_tokens": 1,
+    "max_candidates_per_image": 200
+  },
+  "candidate_filter": {
+    "max_words": 36,
+    "min_content_tokens": {
+      "original": 2,
+      "clause": 2,
+      "noun_phrase": 1,
+      "candidate": 2
+    }
+  },
+  "candidate_type_priority": ["original", "clause", "noun_phrase"],
+  "selection": {
+    "B1": {"coverage": 1.0, "diversity": 0.0, "role_novelty": 0.0},
+    "B2": {"coverage": 0.0, "diversity": 1.0, "role_novelty": 0.0},
+    "B3": {"coverage": 0.5, "diversity": 0.5, "role_novelty": 0.0},
+    "B4": {"coverage": 0.4, "diversity": 0.4, "role_novelty": 0.2}
+  },
+  "metrics": {
+    "roles": ["Entity", "Attribute", "Action", "Relation", "Context"],
+    "clip_model": "ViT-B/16",
+    "clip_batch_size": 256
+  }
+}
