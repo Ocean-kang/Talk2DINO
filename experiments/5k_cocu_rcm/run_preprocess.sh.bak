@@ -1,0 +1,96 @@
+#!/usr/bin/env bash
+set -euo pipefail
+ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)"
+cd "$ROOT"
+
+BASE_TRAIN="${BASE_TRAIN:-outputs/5k_rich_diversity/work/raw_train.pth}"
+COCU_MATCHES="${COCU_MATCHES:-outputs/local_cocu_talk2dino/D_region_discovery/matched/matched_concepts_detailed.json}"
+IMAGE_ROOT="${IMAGE_ROOT:-data/coco2014_subset_50k}"
+WORK_DIR="${WORK_DIR:-outputs/5k_cocu_rcm/work}"
+REGION_DIR="${REGION_DIR:-${WORK_DIR}/region_gallery}"
+CONFIG="${CONFIG:-configs/vitb_mlp_infonce.yaml}"
+DEVICE="${DEVICE:-cuda}"
+CLIP_MODEL="${CLIP_MODEL:-ViT-B/16}"
+MAX_NOVEL="${MAX_NOVEL:-3}"
+K_SHOT="${K_SHOT:-2}"
+NEGATIVES="${NEGATIVES:-16}"
+STAGE="${STAGE:-all}"
+OVERWRITE="${OVERWRITE:-0}"
+
+mkdir -p "$WORK_DIR" "$REGION_DIR"
+need_file() { [[ -f "$1" ]] || { echo "[ERROR] Missing file: $1" >&2; exit 1; }; }
+
+check_clip_cache() {
+  python - "$CLIP_MODEL" <<'PY'
+import pathlib, sys, clip
+name = sys.argv[1]
+if name not in clip._MODELS:
+    raise SystemExit("Unknown CLIP model: " + name)
+filename = clip._MODELS[name].split("/")[-1]
+path = pathlib.Path.home() / ".cache" / "clip" / filename
+if not path.is_file():
+    raise SystemExit("CLIP cache missing (no download will be attempted): " + str(path))
+print("[cache] CLIP:", path)
+PY
+}
+
+do_concept() {
+  need_file "$BASE_TRAIN"; need_file "$COCU_MATCHES"
+  python experiments/5k_cocu_rcm/data/build_concept_archive.py \
+    --source "$COCU_MATCHES" --base-train "$BASE_TRAIN" --out-dir "$WORK_DIR"
+}
+do_build() {
+  need_file "$BASE_TRAIN"; need_file "$WORK_DIR/matched_concepts_detailed_train.json"; need_file "$CONFIG"
+  if [[ -f "$WORK_DIR/train_augmented.pth" && "$OVERWRITE" != "1" ]]; then
+    echo "[cache] train_augmented.pth exists; reusing."; return
+  fi
+  check_clip_cache
+  python experiments/local_cocu_novel/build_train.py \
+    --base-train "$BASE_TRAIN" \
+    --matched "$WORK_DIR/matched_concepts_detailed_train.json" \
+    --output "$WORK_DIR/train_augmented.pth" \
+    --manifest "$WORK_DIR/train_augmented_manifest.json" \
+    --max-novel "$MAX_NOVEL" --clip-model "$CLIP_MODEL" \
+    --batch-size 256 --device "$DEVICE"
+}
+do_region() {
+  need_file "$BASE_TRAIN"
+  EXTRA=()
+  [[ "$OVERWRITE" == "1" ]] && EXTRA+=(--overwrite)
+  python experiments/5k_cocu_rcm/data/extract_region_gallery.py \
+    --base-train "$BASE_TRAIN" --image-root "$IMAGE_ROOT" \
+    --out-dir "$REGION_DIR" --device "$DEVICE" \
+    --quantile 0.90 --expand 0.15 "${EXTRA[@]}"
+}
+do_verify() {
+  need_file "$WORK_DIR/concept_archive.json"; need_file "$REGION_DIR/region_metadata.json"
+  check_clip_cache
+  python experiments/5k_cocu_rcm/data/verify_regions.py \
+    --concept-archive "$WORK_DIR/concept_archive.json" \
+    --region-metadata "$REGION_DIR/region_metadata.json" \
+    --image-root "$IMAGE_ROOT" \
+    --out "$WORK_DIR/verified_region_concepts.json" \
+    --report "$WORK_DIR/region_verification_report.json" \
+    --clip-model "$CLIP_MODEL" --device "$DEVICE" \
+    --max-regions-per-image 3 \
+    --min-crop-score "${MIN_CROP_SCORE:-0.0}" \
+    --min-local-gain "${MIN_LOCAL_GAIN:--1.0}" \
+    --min-margin "${MIN_MARGIN:-0.0}"
+}
+do_sample() {
+  need_file "$WORK_DIR/train_augmented.pth"; need_file "$WORK_DIR/verified_region_concepts.json"
+  python experiments/5k_cocu_rcm/data/build_sampling_index.py \
+    --train-augmented "$WORK_DIR/train_augmented.pth" \
+    --verified "$WORK_DIR/verified_region_concepts.json" \
+    --out-dir "$WORK_DIR" --k "$K_SHOT" --negatives "$NEGATIVES" --seed 123
+}
+
+case "$STAGE" in
+  concept) do_concept ;;
+  build) do_build ;;
+  region) do_region ;;
+  verify) do_verify ;;
+  sample) do_sample ;;
+  all) do_concept; do_build; do_region; do_verify; do_sample ;;
+  *) echo "[ERROR] STAGE must be concept|build|region|verify|sample|all" >&2; exit 2 ;;
+esac

@@ -1,0 +1,38 @@
+{
+  "package": "Talk2DINO 5K CoCu-RCM side-car experiment",
+  "version": "0.1.0",
+  "original_repository_files_modified": false,
+  "new_directory": "experiments/5k_cocu_rcm/",
+  "reused_repository_components": [
+    "src.dataset.DinoClipDataset",
+    "src.model.ProjectionLayer",
+    "src.loss.ContrastiveLoss",
+    "src.train_util",
+    "experiments/local_cocu_talk2dino/common/vision.py",
+    "experiments/local_cocu_talk2dino/common/algorithms.py",
+    "experiments/local_cocu_talk2dino/common/data.py",
+    "experiments/local_cocu_novel/build_train.py",
+    "src/open_vocabulary_segmentation/"
+  ],
+  "python_compile_ok": true,
+  "unit_test_returncode": 0,
+  "unit_test_summary": "tmp.QlpUkOUI9D/artifact_tool_v2-2.8.66/artifact_tool/rpc/client.py\", line 175, in call\nartifact_tool.rpc.client.RemoteError: Element ordering requires an owning element collection.\ntest_audit_record_format (test_concept_adapter.TestConceptAdapter.test_audit_record_format) ... ok\ntest_matched_detailed_format (test_concept_adapter.TestConceptAdapter.test_matched_detailed_format) ... ok\ntest_empty_batch_returns_differentiable_zero (test_rcm_loss.TestRCMLoss.test_empty_batch_returns_differentiable_zero) ... /mnt/data/5k_cocu_rcm_experiment/tests/test_rcm_loss.py:31: UserWarning: Converting a tensor with requires_grad=True to a scalar may lead to unexpected behavior.\nConsider using tensor.detach() first. (Triggered internally at /pytorch/torch/csrc/autograd/generated/python_variable_methods.cpp:836.)\n  self.assertEqual(float(loss), 0.0)\nok\ntest_finite_and_gradient (test_rcm_loss.TestRCMLoss.test_finite_and_gradient) ... ok\ntest_overlap_filter (test_sampling_utils.TestSamplingHelpers.test_overlap_filter) ... ok\ntest_stable_rng (test_sampling_utils.TestSamplingHelpers.test_stable_rng) ... ok\n\n----------------------------------------------------------------------\nRan 6 tests in 0.005s\n\nOK\n",
+  "shell_syntax": {
+    "run_all.sh": {
+      "returncode": 0
+    },
+    "run_train.sh": {
+      "returncode": 0
+    },
+    "run_smoke_test.sh": {
+      "returncode": 0
+    },
+    "run_preprocess.sh": {
+      "returncode": 0
+    },
+    "run_seg_eval.sh": {
+      "returncode": 0
+    }
+  },
+  "end_to_end_gpu_validation": "not run in artifact sandbox; requires the user's Talk2DINO checkout, 5K data, CLIP and DINO caches"
+}
