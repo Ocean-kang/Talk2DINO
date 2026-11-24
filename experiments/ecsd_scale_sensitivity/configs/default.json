@@ -1,0 +1,30 @@
+{
+  "dataset": {
+    "train_images": 82783,
+    "val_images": 40504,
+    "captions_per_image": 5,
+    "subset_seed": 2026,
+    "subset_sizes": [5000, 10000, 20000, 40000, 82783]
+  },
+  "paths": {
+    "coco_root": "coco",
+    "raw_dir": "data/coco2014_scale",
+    "output_root": "outputs/ecsd_scale_sensitivity",
+    "clip_cache": "~/.cache/clip",
+    "dino_train_source": "outputs/coco2014_b14/train.pth",
+    "dino_val_source": "outputs/coco2014_b14/val.pth",
+    "model_config": "configs/vitb_mlp_infonce.yaml"
+  },
+  "training": {
+    "seeds": [123, 456, 789],
+    "epochs": 100,
+    "batch_size": 128,
+    "learning_rate": 0.0001
+  },
+  "ecsd": {
+    "version": "ECSD-v3.1-B4",
+    "clip_model": "ViT-B/16",
+    "image_chunk_size": 128,
+    "clip_batch_size": 256
+  }
+}
