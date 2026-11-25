@@ -1,0 +1,247 @@
+{
+  "package": "Full MSCOCO14 CoCu-RCM experiment",
+  "package_version": "1.0",
+  "repository": "https://github.com/Ocean-kang/Talk2DINO",
+  "audited_git_tree_sha": "442648db0a69e059d931a275e60f23ec58a1fb99",
+  "target_path": "experiments/full_mscoco14_cocu_rcm/",
+  "isolation": "Only new experiment files; no original source/config/weight/data files are included or modified.",
+  "contains_dataset_or_weights": false,
+  "created_utc": "2026-11-24T11:22:19.267834+00:00",
+  "verification": {
+    "python_files_syntax_checked": 27,
+    "shell_scripts_syntax_checked": 6,
+    "unit_tests_passed": 11,
+    "cli_help_entrypoints_passed": 8,
+    "package_smoke_wrapper_passed": true,
+    "full_coco_training_run_performed": false
+  },
+  "file_count_excluding_manifest": 45,
+  "total_size_bytes_excluding_manifest": 209703,
+  "files": [
+    {
+      "path": "README.md",
+      "size_bytes": 15949,
+      "sha256": "66d79d5cbcc7f095574a39cd01c7c2a4a5fcec0fd1eb71b67082a1c8f927acae"
+    },
+    {
+      "path": "common/__init__.py",
+      "size_bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "common/io.py",
+      "size_bytes": 5948,
+      "sha256": "d7cd3cee838b737f1cb29e3b4b9a1481c3ea4194a4617bd93e426c697af61a48"
+    },
+    {
+      "path": "configs/base.yaml",
+      "size_bytes": 596,
+      "sha256": "ae4574ec5f8cfef7030252b5e12dea312408cd877a8d33f2957934c2f8ae03b3"
+    },
+    {
+      "path": "configs/cocu.yaml",
+      "size_bytes": 60,
+      "sha256": "635d0ed45d7145d3f788899453f69af0ac7866ea560f199781e19dab8be33b8b"
+    },
+    {
+      "path": "configs/cocu_rcm.yaml",
+      "size_bytes": 64,
+      "sha256": "f727475bb95ea934fd41b8b9a725b6379797d6c1b57785399ba8d91da1029504"
+    },
+    {
+      "path": "configs/cocu_rcm_shuffled.yaml",
+      "size_bytes": 73,
+      "sha256": "1cc47dee1447ac038e323c5e1665d9de93a0848c29b9a58fd5a8b587b89575cf"
+    },
+    {
+      "path": "configs/cocu_same.yaml",
+      "size_bytes": 65,
+      "sha256": "541d31ac0880b904734b8a711a1334c16d3c0c662e41e598d77d602fb64594e0"
+    },
+    {
+      "path": "configs/raw.yaml",
+      "size_bytes": 59,
+      "sha256": "9d22a7bfab5158ce50f249153df5d9062f28c352d3db914de15d07ae46e61e41"
+    },
+    {
+      "path": "data/__init__.py",
+      "size_bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "data/build_augmented_train.py",
+      "size_bytes": 3621,
+      "sha256": "c19d7e709d2e8816e5c6c9f39703e1a439ffb8b72ff647ceb3f768681c3c4527"
+    },
+    {
+      "path": "data/build_full_concept_archive.py",
+      "size_bytes": 12713,
+      "sha256": "047b9ff4890574bd45872942fb30ab57447d1314466f3ed14ba9bcc026114e5b"
+    },
+    {
+      "path": "data/build_sampling_index.py",
+      "size_bytes": 19651,
+      "sha256": "bc55dfee6590e9010038d25927de29bf01f0ba7be8da1f2ba764624c7d4f7427"
+    },
+    {
+      "path": "data/extract_region_gallery.py",
+      "size_bytes": 11516,
+      "sha256": "6f7fae1311f454382eeffbf4a29904a4a19019e031bd4de77f890c1232debf87"
+    },
+    {
+      "path": "data/generate_full_cocu_matches.py",
+      "size_bytes": 13866,
+      "sha256": "a862a7579598bb3b2bf82f238bbd85eb4ed283ff2ab4bf41b543d1584bd2d56e"
+    },
+    {
+      "path": "data/prepare_full_data.py",
+      "size_bytes": 5814,
+      "sha256": "7a2b66587932fe331db6af7e96687c73f24a17c13666c6155ce1f01f0ede78ec"
+    },
+    {
+      "path": "data/verify_regions.py",
+      "size_bytes": 14882,
+      "sha256": "eb959f0f8ee86c6b0ab7c3a4016f117614509d16ca775915cf7e0b95c2e8a7a8"
+    },
+    {
+      "path": "diagnostics/__init__.py",
+      "size_bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "diagnostics/build_report.py",
+      "size_bytes": 11120,
+      "sha256": "c57f765294bff601708d22690414b5c50ae1a4e685a158042adfac1b68301ea4"
+    },
+    {
+      "path": "diagnostics/collect_results.py",
+      "size_bytes": 3460,
+      "sha256": "5f9ba48ad6cf0b0c2da9a400b4c1248d0d4e231f66ad241dc5ab4ad2544d2adc"
+    },
+    {
+      "path": "docs/data_manifest.md",
+      "size_bytes": 2642,
+      "sha256": "c950cba60a33637dc225079e14d7314998ac01f3ab7982b2e392df9e61d26296"
+    },
+    {
+      "path": "docs/experiment_design.md",
+      "size_bytes": 4094,
+      "sha256": "697dcc6f2da814f5356718cd942493244f981fe5d500dbd13087e4968578103e"
+    },
+    {
+      "path": "docs/implementation_report.md",
+      "size_bytes": 4708,
+      "sha256": "c2f91d145958f7c36340c38b706c46f98ccf0a124780bf7b93db1121f57d5f2c"
+    },
+    {
+      "path": "docs/repository_audit.md",
+      "size_bytes": 7329,
+      "sha256": "6c99e4be61e8ec0f8ad0dde84e85a56c18876fc447eeffe4617c99aaa0d52606"
+    },
+    {
+      "path": "docs/verification_report.md",
+      "size_bytes": 1974,
+      "sha256": "295a109d277e31544c0211827c21b2d8408dbc2c77e3d006c6f59745df0f04dd"
+    },
+    {
+      "path": "evaluation/__init__.py",
+      "size_bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "evaluation/write_manifest.py",
+      "size_bytes": 1846,
+      "sha256": "b0d32638d9176552a73ead49f82ee7c013b74fe06db4894a98f345a8b7074176"
+    },
+    {
+      "path": "models/__init__.py",
+      "size_bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "models/rcm_loss.py",
+      "size_bytes": 1892,
+      "sha256": "95d566e8027eb93610e5d0567d5e07ce0784d2375df73b00b8879dead786d4ed"
+    },
+    {
+      "path": "scripts/run_all.sh",
+      "size_bytes": 532,
+      "sha256": "7cf3997eed9f62a26e6606c9980591980f491e00629ac53e48a5a2e52d1c1dfd"
+    },
+    {
+      "path": "scripts/run_preprocess.sh",
+      "size_bytes": 8520,
+      "sha256": "dc7cd4f14d9fb75be00bba1c1f7e8e7a4557c3bf994c5804c5a59c6f65402737"
+    },
+    {
+      "path": "scripts/run_seg_eval.sh",
+      "size_bytes": 4513,
+      "sha256": "c3225114478a64d69fc5e25d9de4450c4515338366920c56cb7c96169b6389a9"
+    },
+    {
+      "path": "scripts/run_smoke_test.sh",
+      "size_bytes": 1386,
+      "sha256": "40d49b4ed444644ca21792a128a01f6ca2286e6c78db5f521ec632d3361b56de"
+    },
+    {
+      "path": "scripts/run_train.sh",
+      "size_bytes": 3241,
+      "sha256": "13c414cbb4823de0fb8e7eacc5be62c2d45bf5bf0a5d3b30a04ce8fd4cfe6ab8"
+    },
+    {
+      "path": "scripts/run_train_parallel.sh",
+      "size_bytes": 2512,
+      "sha256": "e4c968457d46642cc4a324c5235ffca1f6e814e7d93afa2ea927f51b3c9965bd"
+    },
+    {
+      "path": "tests/test_cli_contracts.py",
+      "size_bytes": 1403,
+      "sha256": "b8217de2ca03d73473ca8b669449fcb934812dfecb94edb9a664ef06a27b7687"
+    },
+    {
+      "path": "tests/test_concepts.py",
+      "size_bytes": 723,
+      "sha256": "9223051bbeecdf203d9d92380498f5c0b588d0ecc7fc6085e55510b4bef2f838"
+    },
+    {
+      "path": "tests/test_dataset_synthetic.py",
+      "size_bytes": 5098,
+      "sha256": "5aa2224781d95515a67010b479a761527059e26ddbbb834d157e550cba4072c5"
+    },
+    {
+      "path": "tests/test_full_archive_guard.py",
+      "size_bytes": 1654,
+      "sha256": "03314ec90faedc562f1f21bf889609dd2e2e5f580c57b2b7861debd795581a7c"
+    },
+    {
+      "path": "tests/test_rcm_loss.py",
+      "size_bytes": 1510,
+      "sha256": "a1f48fa509172ae2a3a2a72aec34304f03871bb1fd5f97165a5e6d0a45cdc424"
+    },
+    {
+      "path": "tests/test_sampling.py",
+      "size_bytes": 2016,
+      "sha256": "1f140a5b692480f1933aca114549c0dc2b8deb3f71f2898cd5dffee3007a2eee"
+    },
+    {
+      "path": "tests/test_sampling_pipeline.py",
+      "size_bytes": 5143,
+      "sha256": "deca69bfaf6a7988bb6ea2655bb448d9ff836bc43d8801fa52fc529deaee7dca"
+    },
+    {
+      "path": "training/__init__.py",
+      "size_bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "training/rcm_dataset.py",
+      "size_bytes": 8168,
+      "sha256": "d1ae3a43daa3d6398c8bb40488fa09242547838a382cb3a57f83714324003598"
+    },
+    {
+      "path": "training/train_full_cocu_rcm.py",
+      "size_bytes": 19342,
+      "sha256": "9b72c18710ee7e1477dbe36a76b82e8a44f31926be226e7708ed4874567be953"
+    }
+  ]
+}

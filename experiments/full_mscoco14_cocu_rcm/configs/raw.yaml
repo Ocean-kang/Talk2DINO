@@ -1,0 +1,4 @@
+arm: raw
+training:
+  lambda_local: 0.0
+  temperature: 0.07

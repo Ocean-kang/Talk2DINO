@@ -1,0 +1,28 @@
+experiment:
+  name: full_mscoco14_cocu_rcm
+  dataset: MSCOCO2014
+  train_images_expected: 82783
+  val_images_expected: 40504
+region:
+  dino_model: dinov2_vitb14_reg
+  resolution: 448
+  expected_heads: 12
+  feature_dim: 768
+  attention_quantile: 0.90
+  bbox_expansion: 0.15
+verification:
+  clip_model: ViT-B/16
+  template: "a photo of a {}"
+  max_regions_per_concept: 3
+  min_crop_score: 0.0
+  min_local_gain: -1.0
+  min_margin: 0.0
+sampling:
+  k_shot: 2
+  negatives: 16
+  seed: 123
+training:
+  source_config: configs/vitb_mlp_infonce.yaml
+  temperature: 0.07
+  lambda_local: 0.1
+  num_workers: 8

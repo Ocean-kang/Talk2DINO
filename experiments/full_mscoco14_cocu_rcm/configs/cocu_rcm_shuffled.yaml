@@ -1,0 +1,4 @@
+arm: cocu_rcm_shuffled
+training:
+  lambda_local: 0.1
+  temperature: 0.07
